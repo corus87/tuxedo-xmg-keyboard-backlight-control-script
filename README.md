@@ -1,4 +1,4 @@
-# Tuxedo Polaris and XMG Core E21 (2021) keyboard backlight control for Linux
+# Tuxedo Polaris and XMG Core keyboard backlight control for Linux
 
 ## Usage
 ```bash
@@ -17,7 +17,7 @@ This script needs root permission to work.
 
 ## Special note about XMG Core
 To change color and brightness in Linux you need the [tuxedo-keyboard](https://github.com/tuxedocomputers/tuxedo-keyboard) kernel module. 
-The Tuxedo Polaris and XMG Core E21 got the same hardware, however both got a different firmware and the original tuxedo-keyboard kernel module
+The Tuxedo Polaris and XMG Core got the same hardware, however both got a different firmware and the original tuxedo-keyboard kernel module
 checks the board name.
 
 To use the kernel module you have to compile your own module and add your device to the list of supported laptops. 
