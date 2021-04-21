@@ -10,8 +10,13 @@ SUPPORTED_COLORS = ["BLACK", "RED", "GREEN", "BLUE", "YELLOW", "MAGENTA", "CYAN"
 
 def getCurrentBrightness():
     # Using regex to get the current brightness
-    with open(CONFIG_FILE) as f:    
-        return re.search('brightness=([^\s]+)', f.read()).group(1).strip()
+    #with open(CONFIG_FILE) as f:    
+    #    return re.search('brightness=([^\s]+)', f.read()).group(1).strip()
+    
+    # Get the brightness from sys, instead from the config file, 
+    # since changing brightness with FN+Space won't write it to the config
+    cl = subprocess.run(["cat", "/sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/brightness"], stdout=subprocess.PIPE)
+    return cl.stdout.decode("UTF-8").strip()
 
 def getCurrentColor():
     # Using regex to get the current color
