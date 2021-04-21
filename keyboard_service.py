@@ -86,7 +86,7 @@ if os.getuid() != 0:
     sys.exit()
 
 
-parser = argparse.ArgumentParser(description='Set color for Tuxedo Polaris and XMG Core E21 (XMG Core needs a customized version of tuxedo-keyboard with added DMI_BOARD_NAME of the used XMG Core)')
+parser = argparse.ArgumentParser(description='Set color for Tuxedo Polaris and XMG Core (XMG Core needs a customized version of tuxedo-keyboard with added DMI_BOARD_NAME of the used XMG Core)')
 parser.add_argument('--set_color', help="Supported Colors: BLACK, RED, GREEN, BLUE, YELLOW, MAGENTA, CYAN, WHITE")
 parser.add_argument('--set_brightness', help="Any integer between 0-200.")
 parser.add_argument('--get_color', action="store_true", help="Returns current color.")
