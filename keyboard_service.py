@@ -1,22 +1,17 @@
 #!/usr/bin/python3
-import subprocess
-import argparse
-import sys
 import re
 import os
+import argparse
+import sys
 
 CONFIG_FILE = "/etc/modprobe.d/tuxedo_keyboard.conf"
+BRIGHTNESS_FILE = "/sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/brightness"
+COLOR_STRING_FILE = "/sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/color_string"
 SUPPORTED_COLORS = ["BLACK", "RED", "GREEN", "BLUE", "YELLOW", "MAGENTA", "CYAN", "WHITE"]
 
 def getCurrentBrightness():
-    # Using regex to get the current brightness
-    #with open(CONFIG_FILE) as f:    
-    #    return re.search('brightness=([^\s]+)', f.read()).group(1).strip()
-    
-    # Get the brightness from sys, instead from the config file, 
-    # since changing brightness with FN+Space won't write it to the config
-    cl = subprocess.run(["cat", "/sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/brightness"], stdout=subprocess.PIPE)
-    return cl.stdout.decode("UTF-8").strip()
+    with open(BRIGHTNESS_FILE, "r") as f:
+        return f.read().strip()
 
 def getCurrentColor():
     # Using regex to get the current color
@@ -28,13 +23,15 @@ def setParameter(color=None, brightness=None):
         color = getCurrentColor()
     else:
         # Change current color by writing to sys. Does not survive a reboot  
-        subprocess.call("echo %s | tee /sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/color_string" % color.upper(), shell=True, stdout=subprocess.DEVNULL)
+        with open(COLOR_STRING_FILE, "w") as f:
+            f.write(color.upper())
 
     if brightness is None:
         brightness = getCurrentBrightness()
     else:
         # Change current brightness by writing to sys. Does not survive a reboot
-        subprocess.call("echo %s | tee /sys/devices/platform/tuxedo_keyboard/uw_kbd_bl_color/brightness" % brightness, shell=True, stdout=subprocess.DEVNULL)
+        with open(BRIGHTNESS_FILE, "w") as f:
+            f.write(brightness)
 
     with open(CONFIG_FILE, "w") as f:
         # Write current options to config file, to survive reboot 
@@ -81,12 +78,7 @@ def configIsValid():
 
 skip_check = False
 
-if os.getuid() != 0:
-    print("This script needs root permission. Change to root or use sudo.")
-    sys.exit()
-
-
-parser = argparse.ArgumentParser(description='Set color for Tuxedo Polaris and XMG Core (XMG Core needs a customized version of tuxedo-keyboard with added DMI_BOARD_NAME of the used XMG Core)')
+parser = argparse.ArgumentParser(description='Set color for Tuxedo Polaris and XMG Core E21 (XMG Core needs a customized version of tuxedo-keyboard with added DMI_BOARD_NAME of the used XMG Core)')
 parser.add_argument('--set_color', help="Supported Colors: BLACK, RED, GREEN, BLUE, YELLOW, MAGENTA, CYAN, WHITE")
 parser.add_argument('--set_brightness', help="Any integer between 0-200.")
 parser.add_argument('--get_color', action="store_true", help="Returns current color.")
@@ -104,6 +96,10 @@ if not skip_check:
 
 
 if args.set_color:
+    if os.getuid() != 0:
+        print("set_color needs root permission. Change to root or use sudo.")
+        sys.exit()
+
     if args.set_color.upper() in SUPPORTED_COLORS: 
         setParameter(color=args.set_color)
     else:
@@ -112,6 +108,9 @@ if args.set_color:
         sys.exit()
 
 if args.set_brightness:
+    if os.getuid() != 0:
+        print("set_brightness needs root permission. Change to root or use sudo.")
+        sys.exit()
     try:
         brightness = int(args.set_brightness)
     except ValueError:
